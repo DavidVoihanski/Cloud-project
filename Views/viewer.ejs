@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>		
+        <title>Deshboard</title>
+    </head>
+    <body onload="initSocket()">
+        
+        <h1 style="text-align:center; padding-bottom: 50px; padding-top: 50px;">Dashboard</h1>
+        <div class="container">
+            <div class="row">
+                <div class="col-6 chart">
+                    <canvas id="RealTimeChart" width= "400" height="220"></canvas>
+                </div>
+                <div class="col-6 chart">
+                    <canvas id="SnapShotChartTotals" width= "400" height="220"></canvas>
+                </div>
+                <div class="col-6 chart">
+                  <canvas id="SnapShotChartAvg" width= "500" height="220"></canvas>
+              </div>
+                <table class="table" id="SnapShotTable">
+                    <thead class="black white-text">
+                      <tr>
+                        <th scope="col">Number of waiting calls</th>
+                        <th scope="col">Waiting times</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Otto</td>
+                        <td>@mdo</td>
+                      </tr>
+                      <tr>
+                        <td>Thornton</td>
+                        <td>@fat</td>
+                      </tr>
+                      <tr>
+                        <td>the Bird</td>
+                        <td>@twitter</td>
+                      </tr>
+                    </tbody>
+                  </table>
+            </div>
+            <table id="cityTopicsTable" border="1" class="table table-dark">
+              <tr>
+                  <th>City</th>
+                  <th>Number of calls at each city</th>
+                  <th>Topic</th>
+                  <th>Number of calls at each topic</th>
+              </tr>
+          </table>
+            <div class="row">
+                <div class="col-6 chart">
+                  <p style="text-align: center; font: bold;">Number of calls at each topic</p>.
+                    <canvas id="lastChart" width= "500" height="220"></canvas>
+                </div>
+                <div class="col-6 chart">
+                  <p style="text-align: center; font: bold;">Number of calls at each language.</p>
+                  <canvas id="lastChart2" width= "500" height="220"></canvas>
+              </div>
+            </div>
+        </div>
+        <script src="./viewer.js"></script>
+    </body>
+</html>

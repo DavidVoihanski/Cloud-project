@@ -1,0 +1,43 @@
+<html>
+
+<head>
+    <!--
+        https://medium.com/@noufel.gouirhate/build-a-simple-chat-app-with-node-js-and-socket-io-ea716c093088xc
+        https://hmh.engineering/experimenting-with-apache-kafka-and-nodejs-5c0604211196
+        https://www.sitepoint.com/using-redis-node-js/
+    -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+    <script src="./sender.js"></script>
+</head>
+
+<body class="p-3 mb-2 bg-light text-white" data-gr-c-s-loaded="true" onload="initSocket()"></body>
+<div class="btn-group">
+    <em style="color: black; font: bold; padding-right: 20; text-align:center;">Total Waiting calls:</em>
+    <input type="number" id="total" min="0" max="200" value="0" class="input-group-text">
+    <input type="button" value="Set" min="0" onclick="sendMessage(total.value)" class="input-group-text" />
+    &nbsp;
+    <select id="mood" class="input-group-text">
+        <option value='Emergency'>חירום</option>
+        <option value='Emergency routine'>שגרת חירום</option>
+        <option value='normal'>רגיעה</option>
+    </select>
+</div>
+<a href="./view" style="display:flex; justify-content:flex-end; width:100%; padding:0;">Viewer</a>
+<hr>
+<input type="button" onclick="startConv()" value="Answer Call" class="input-group-text" style="padding-bottom: 20;" />
+<table id="openConversations" border="1" class="table table-dark">
+    <tr>
+        <th>Start Time</th>
+        <th>City</th>
+        <th>Topic</th>
+        <th>Language</th>
+        <th>Gender</th>
+        <th>Age</th>
+        <th>End</th>
+    </tr>
+</table>
+</body>
+
+</html>
