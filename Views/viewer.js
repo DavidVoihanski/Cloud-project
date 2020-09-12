@@ -1,5 +1,5 @@
 
-
+Chart.defaults.global.defaultFontColor = 'white';
 
 var colors = ['#FF6633', '#FFB399', '#FF33FF', '#FFFF99', '#00B3E6', 
 '#E6B333', '#3366E6', '#999966', '#99FF99', '#B34D4D',
@@ -67,42 +67,38 @@ var chartAvg = new Chart(myChartAvgLocation, {
 });
 
 function addData(chart, label, data_, location) {
-  
-    chart = new Chart(location, {
-        type: 'bar',
-        data: {
-            datasets: [{
-                label: label,
-                data: [data_],
-                // this dataset is drawn below
-                backgroundColor: colors,
-                labels: "label"
-        }]
+    chart = new Chart(location, {type:"bar"});
+    var chartData =[{
+            label: label,
+            data: [data_],
+            // this dataset is drawn below
+            backgroundColor: colors,
+            labels: "label"
+            
+    }]
+    var chartOptions = {
+        responsive: true,
+        tooltips: { callbacks: { title: function(tooltipItem, data) { 
+            return  data.labels[tooltipItem.Index]; }}
         },
-        options: {
-            responsive: true,
-            tooltips: { callbacks: { title: function(tooltipItem, data) { 
-                return  data.labels[tooltipItem.Index]; }}
-            },
-            scales: {
-                yAxes: [{
-                        display: true,
-                        ticks: {
-                            max: parseInt(data_) + 1,
-                            min: 0,
-                            stepSize: Math.ceil(parseInt(data_)/5)
-                        }
-                    }]
-            }
+        scales: {
+            yAxes: [{
+                    display: true,
+                    ticks: {
+                        max: parseInt(data_) + 1,
+                        min: 0,
+                        stepSize: Math.ceil(parseInt(data_)/5)
+                    }
+                }]
         }
-    });
+    }
+    
+    chart.data.datasets = chartData;
+    chart.options = chartOptions;
     chart.update();
 }
 function removeData(chart, location){
     chart.destroy();
-    //location.clear();
-   
-    //chart.update();
 }
 function updateAvg(avg){
     removeData(window.chartAvg, myChartAvgLocation);
@@ -123,8 +119,8 @@ let colors3 = []
 
 colors3 = ['#49A9EA', '#36CAAB', '#34495E', '#B370CF','#49A9EA', '#36CAAB', '#34495E', '#B370CF','#49A9EA', '#36CAAB', '#34495E', '#B370CF'];
 
-let myChart3 =document.getElementById("lastChart").getContext('2d');
-var chart3 = new Chart(myChart3, {
+let CallsPerTopicChartCanvas =document.getElementById("CallsPerTopicChartCanvas").getContext('2d');
+var CallsPerTopicChart = new Chart(CallsPerTopicChartCanvas, {
     type: 'pie',
     data: {
         datasets: [{
@@ -135,8 +131,8 @@ var chart3 = new Chart(myChart3, {
         labels: topics,
     }
 });
-let myChart4 = document.getElementById("lastChart2").getContext('2d');
-var chart4 = new Chart(myChart4, {
+let CallsPerLanguageChartCanvas = document.getElementById("CallsPerLanguageChartCanvas").getContext('2d');
+var CallsPerLanguageChart = new Chart(CallsPerLanguageChartCanvas, {
     type: 'doughnut',
     data: {
         datasets: [{
@@ -149,39 +145,27 @@ var chart4 = new Chart(myChart4, {
 });
 }
 
-
 async function initSocket() {
     socket = io.connect("http://localhost:6062");
-    alert("connected");
     socket.on("totalWaiting", (msg) => { updateTotalWaiting(msg);});
     socket.on("avgWaitTime", (msg) => { updateAvg(msg);});
     socket.on("topicLang", (msg) => { updateLanguageAndCallTopic(msg)});
     socket.on('cityTopic', (msg) => { updateCityAndCallTopic(msg)});
+    socket.on("totalWaitingCallsForAggregation", (msg) => {updateAggregationTable(msg.totalWaitList, msg.averageWaitList);});
     socket.emit('viewDash',0); 
 }
-      
 
-/*
-let myChart1 = document.getElementById("RealTimeChart").getContext('2d');
-let chart1 = new Chart(myChart1, {
-    type: 'bar',
-    data: {
-        labels:  labels1,
-        datasets: [ {
-            data: data1,
-            backgroundColor: colors1
-        }]
-    },
-    options: {
-        title: {
-            text: "Do you like doughnuts?",
-            display: true
-        }
+function updateAggregationTable(totalWaitingTable, avgWaitTimeTable){
+    let len = totalWaitingTable.length;
+    var table = document.getElementById('SnapShotTable');
+    for (var i = 0; i < len; i++){
+        var tr = table.insertRow();
+        var c = tr.insertCell(0); 
+        c.innerHTML = totalWaitingTable[i];
+        var cC = tr.insertCell(1); 
+        cC.innerHTML = avgWaitTimeTable[i]
     }
-
-});
-*/
-
+}
 
 function updateCityAndCallTopic(msg){
     cities = msg.cities;

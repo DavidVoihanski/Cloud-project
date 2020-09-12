@@ -1,107 +1,8 @@
 var num = 0;
-var cities = [{
-    cityEng: "jerusalem",
-    cityHeb: "ירושלים"
-},
-{
-    cityEng: "naaria",
-    cityHeb: "נהריה"
-},
-{
-    cityEng: "haifa",
-    cityHeb: "חיפה"
-},
-{
-    cityEng: "telAviv",
-    cityHeb: "תל אביב"
-},
-{
-    cityEng: "ashdod",
-    cityHeb: "אשדוד"
-},
-{
-    cityEng: "ashkelon",
-    cityHeb: "אשקלון"
-},
-{
-    cityEng: "beerSheva",
-    cityHeb: "באר שבע"
-},
-{
-    cityEng: "netanya",
-    cityHeb: "נתניה"
-}
-]
-
-var topics = [{
-    topicEng: "Medical",
-    topicHeb: "טיפול רפואי"
-},
-{
-    topicEng: "drugs",
-    topicHeb: "תרופות"
-},
-{
-    topicEng: "food",
-    topicHeb: "מזון"
-},
-{
-    topicEng: "water",
-    topicHeb: "מים"
-},
-{
-    topicEng: "shelter",
-    topicHeb: "מיגון"
-},
-{
-    topicEng: "information",
-    topicHeb: "מידע"
-},
-{
-    topicEng: "evacuation",
-    topicHeb: "פינוי"
-}
-]
-
-var languages = [{
-    langEng: "hebrew",
-    langHeb: "עברית"
-},
-{
-    langEng: "english",
-    langHeb: "אנגלית"
-},
-{
-    langEng: "amharic",
-    langHeb: "אמהרית"
-},
-{
-    langEng: "russian",
-    langHeb: "רוסית"
-},
-{
-    langEng: "arabic",
-    langHeb: "ערבית"
-},
-{
-    langEng: "thai",
-    langHeb: "תאילנדית"
-}
-]
-
-var genders = [{
-    genderEng: "male",
-    genderHeb: "גבר"
-},
-{
-    genderEng: "female",
-    genderHeb: "אישה"
-}]
 
 function initSocket() {
     //socket is global
     socket = io.connect();
-    alert("connected");
 }
 
 function sendMessage(total) {
@@ -173,4 +74,4 @@ function deleteRow(row) {
     document.getElementById('openConversations').deleteRow(i);
 }
 
-module.exports.data = {cities,topics,languages,genders};
+//module.exports.data = {cities,topics,languages,genders};

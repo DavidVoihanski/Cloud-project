@@ -11,14 +11,15 @@ io = require("socket.io-client");
 server = io.connect("http://localhost:6062");
 async = require('async');
 
-/* delete db
-redisClient.flushdb( function (err, succeeded) {
-    console.log(succeeded); // will be true if successfull
-});
-*/
 var todayEnd = new Date().setHours(23, 59, 59, 999);
+var updatedTotalWaitingCalls = new Date().setHours(0, 0, 0, 0);
+var totalWaitingCallsCounter = 0;
+var averageWaitTimeCounter = 0;
+var tempAverageWait = 0;
+var updatedAverageWait = new Date().setHours(0, 0, 0, 0);
+var numberOfCallsForAvg = 0;
 
-///*
+
 redisClient.keys('lang-*', function (err, keys) {
     if (err) return console.log(err);
     async.map(keys, function (key, cb) {
@@ -39,19 +40,33 @@ redisClient.keys('lang-*', function (err, keys) {
         }
     )
 });
-//*/
 server.on("endCallReport", (msg) => {
     callDetailsJson = JSON.parse(msg)
     console.log("end call report in redis: ", msg);
     var Callkey = 'callReport-' + callDetailsJson.id;
     redisClient.set(Callkey, msg, function (err, reply) {
         redisClient.expireat(Callkey, parseInt(todayEnd / 1000));
-        console.log(reply);
     });
     var key = 'waitingTime-' + callDetailsJson.id;
+    
+    if ( Math.floor((new Date() - updatedAverageWait)/60000) > 5 ) {
+        updatedAverageWait = new Date();
+        if (numberOfCallsForAvg > 0){
+            tempAverageWait = tempAverageWait/numberOfCallsForAvg;
+        }
+        redisClient.set("waitTimeForAggregation-" + averageWaitTimeCounter, callDetailsJson.totalTime, function (err, reply) {
+            redisClient.expireat(key, parseInt((+new Date) / 1000) + 600);
+        });
+        averageWaitTimeCounter += 1;
+        tempAverageWait = 0;
+        numberOfCallsForAvg = 0;
+    }
+    else{
+        numberOfCallsForAvg += 1;
+        tempAverageWait += callDetailsJson.totalTime;
+    }
     redisClient.set(key, callDetailsJson.totalTime, function (err, reply) {
         redisClient.expireat(key, parseInt((+new Date) / 1000) + 600);
-        console.log(reply);
     });
     var cityName = "city-" + callDetailsJson.city;
     redisClient.get(cityName, function (err, key) {
@@ -59,7 +74,6 @@ server.on("endCallReport", (msg) => {
         if (key == null) {
             redisClient.set(cityName, 1, function (err, reply) {
                 redisClient.expireat(cityName, parseInt(todayEnd / 1000));
-                console.log(reply);
             });
         }
         else redisClient.incr(cityName);
@@ -70,7 +84,6 @@ server.on("endCallReport", (msg) => {
         if (key == null) {
             redisClient.set(topicName, 1, function (err, reply) {
                 redisClient.expireat(topicName, parseInt(todayEnd / 1000));
-                console.log(reply);
             });
         }
         else redisClient.incr(topicName);
@@ -81,7 +94,6 @@ server.on("endCallReport", (msg) => {
         if (key == null) {
             redisClient.set(langName, 1, function (err, reply) {
                 redisClient.expireat(langName, parseInt(todayEnd / 1000));
-                console.log(reply);
             });
         }
         else redisClient.incr(langName);
@@ -89,10 +101,16 @@ server.on("endCallReport", (msg) => {
 });
 var totalKey = "totalWaiting";
 server.on(totalKey, (msg) => {
+    if ( Math.floor((new Date() - updatedTotalWaitingCalls)/60000) >= 5 ) {
+        updatedTotalWaitingCalls =  new Date();
+        redisClient.set("totalWaitingAgg-" + totalWaitingCallsCounter, parseInt(msg), function (err, reply) {
+            redisClient.expireat(totalKey, parseInt(todayEnd / 1000));
+        });
+        totalWaitingCallsCounter += 1;
+    }
     console.log("New total waiting calls in sender: ", msg);
     redisClient.set(totalKey, parseInt(msg), function (err, reply) {
         redisClient.expireat(totalKey, parseInt(todayEnd / 1000));
-        console.log(reply);
     });
 });
 

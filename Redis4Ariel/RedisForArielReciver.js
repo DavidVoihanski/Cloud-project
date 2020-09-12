@@ -1,105 +1,27 @@
 
 var redis = require('redis');
 var redisClient = redis.createClient();
+var data = require('../Model/data');
 
-var cities = [{
-    cityEng: "jerusalem",
-    cityHeb: "ירושלים"
-},
-{
-    cityEng: "naaria",
-    cityHeb: "נהריה"
-},
-{
-    cityEng: "haifa",
-    cityHeb: "חיפה"
-},
-{
-    cityEng: "telAviv",
-    cityHeb: "תל אביב"
-},
-{
-    cityEng: "ashdod",
-    cityHeb: "אשדוד"
-},
-{
-    cityEng: "ashkelon",
-    cityHeb: "אשקלון"
-},
-{
-    cityEng: "beerSheva",
-    cityHeb: "באר שבע"
-},
-{
-    cityEng: "netanya",
-    cityHeb: "נתניה"
+async function getAverageWaitForAggregation(){
+    let keys = await redisClient.keysAsync('waitTimeForAggregation-*');
+    let averageWaitTimeList = [];
+    for(var i=0;i< keys.length;i++){
+        let response = await redisClient.getAsync(keys[i]);
+        averageWaitTimeList.push(response);
+    }
+    return averageWaitTimeList;
 }
-]
 
-var topics = [{
-    topicEng: "Medical",
-    topicHeb: "טיפול רפואי"
-},
-{
-    topicEng: "drugs",
-    topicHeb: "תרופות"
-},
-{
-    topicEng: "food",
-    topicHeb: "מזון"
-},
-{
-    topicEng: "water",
-    topicHeb: "מים"
-},
-{
-    topicEng: "shelter",
-    topicHeb: "מיגון"
-},
-{
-    topicEng: "information",
-    topicHeb: "מידע"
-},
-{
-    topicEng: "evacuation",
-    topicHeb: "פינוי"
+async function getTotalWaitingForAggregation(){
+    let keys = await redisClient.keysAsync('totalWaitingAgg-*');
+    let totalWaitingList = [];
+    for(var i=0;i< keys.length;i++){
+        let response = await redisClient.getAsync(keys[i]);
+        totalWaitingList.push(response);
+    }
+    return totalWaitingList;
 }
-]
-
-var languages = [{
-    langEng: "hebrew",
-    langHeb: "עברית"
-},
-{
-    langEng: "english",
-    langHeb: "אנגלית"
-},
-{
-    langEng: "amharic",
-    langHeb: "אמהרית"
-},
-{
-    langEng: "russian",
-    langHeb: "רוסית"
-},
-{
-    langEng: "arabic",
-    langHeb: "ערבית"
-},
-{
-    langEng: "thai",
-    langHeb: "תאילנדית"
-}
-]
-
-var genders = [{
-    genderEng: "male",
-    genderHeb: "גבר"
-},
-{
-    genderEng: "female",
-    genderHeb: "אישה"
-}]
 
 async function getTotalWaitingCalls(){
     var totalWaitingCalls = -1;
@@ -131,8 +53,8 @@ async function getAverageWaitTime(){
 
 async function getNumberOfCallsPerLanguage(){
     var langArray = []
-    for(lang in languages)
-        langArray.push(languages[lang].langEng);
+    for(lang in data.languages)
+        langArray.push(data.languages[lang].langEng);
     var countsLangArray = []
     for(lang in langArray){
         let response = await redisClient.getAsync('lang-'+langArray[lang]);
@@ -144,8 +66,8 @@ async function getNumberOfCallsPerLanguage(){
 
 async function getNumberOfCallsPerTopic(){
     var topicArray = []
-    for(topic in topics)
-        topicArray.push(topics[topic].topicEng);
+    for(topic in data.topics)
+        topicArray.push(data.topics[topic].topicEng);
     var countsTopicArray = []
     for(topic in topicArray){
         let response = await redisClient.getAsync('topic-'+topicArray[topic]);
@@ -157,8 +79,8 @@ async function getNumberOfCallsPerTopic(){
 
 async function getNumberOfCallsPerCity(){
     var citiesArray = []
-    for(city in cities)
-        citiesArray.push(cities[city].cityEng);
+    for(city in data.cities)
+        citiesArray.push(data.cities[city].cityEng);
     var countsCityArray = []
     for(city in citiesArray){
         let response = await redisClient.getAsync('city-'+citiesArray[city]);
@@ -168,4 +90,5 @@ async function getNumberOfCallsPerCity(){
     return [citiesArray, countsCityArray];
 }
 
-module.exports = {getTotalWaitingCalls, getAverageWaitTime, getNumberOfCallsPerCity, getNumberOfCallsPerTopic, getNumberOfCallsPerLanguage };
+module.exports = {getTotalWaitingCalls, getAverageWaitTime, getNumberOfCallsPerCity, 
+    getNumberOfCallsPerTopic, getNumberOfCallsPerLanguage, getTotalWaitingForAggregation, getAverageWaitForAggregation };

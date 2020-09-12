@@ -33,13 +33,20 @@ async function viewDash(){
         languages : languages,
         languagesCount : callPerLanguage
     };
-    ioServerRedis.emit("topicLang",callTopicAndLanguageChartData);
     var callTopicAndCitiesChartData = {
         topics : topics,
         topicsCount : callsPerTopic,
         cities : cities,
         citiesCount : callsPerCity
     };
+    var totalWaitingListForAggregation = await redisReceiver.getTotalWaitingForAggregation();
+    var averageWaitTimeListForAggregation = await redisReceiver.getAverageWaitForAggregation();
+    var dataForAggregationTabe = {
+        totalWaitList: totalWaitingListForAggregation,
+        averageWaitList: averageWaitTimeListForAggregation
+    }
+    ioServerRedis.emit("totalWaitingCallsForAggregation", dataForAggregationTabe);
+    ioServerRedis.emit("topicLang",callTopicAndLanguageChartData);
     ioServerRedis.emit("cityTopic",callTopicAndCitiesChartData);
     ioServerRedis.emit("totalWaiting",totalWaitingCalls);
     ioServerRedis.emit("avgWaitTime", avgWaitTime);

@@ -6,7 +6,7 @@ const port = 3333
 var selection = require('./Views/sender');
 
 //------------ kafka------------
-const kafka = require('./kafkaProduce');
+const kafka = require('./Kafka/kafkaProduce');
 const bodyParser = require('body-parser');
 const { TLSSocket } = require('tls');
 
@@ -32,12 +32,14 @@ app.get('/view', (req, res) => res.render('viewer'));
 app.get('/viewer.js', (req, res) => res.sendFile('Views/viewer.js', { root: __dirname }));
 app.get('/main.css', (req, res) => res.sendFile('Views/main.css', { root: __dirname }));
 app.get('/sender.js', (req, res) => res.sendFile('Views/sender.js', { root: __dirname }));
+app.get('/viewer.css', (req, res) => res.sendFile('Views/viewer.css', { root: __dirname }));
+app.get('/data.js', (req, res) => res.sendFile('Model/data.js', { root: __dirname }));
 
 
 //------------ Socket.io ----------------
 io.on("connection", (socket) => {
     console.log("new user connected");
-    socket.on("totalWaitingCalls", (msg) => { console.log(msg); kafka.publish(msg)});
+    socket.on("totalWaitingCalls", (msg) => { console.log("got new message in app.js: ", msg); kafka.publish(msg)});
     socket.on("callDetails", (msg) => { console.log(msg);kafka.publish(msg)});
 });
 
