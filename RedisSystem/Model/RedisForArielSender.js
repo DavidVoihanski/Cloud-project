@@ -48,7 +48,7 @@ ioClient.on("endCallReport", (msg) => {
         redisClient.expireat(Callkey, parseInt(todayEnd / 1000));
     });
     var key = 'waitingTime-' + callDetailsJson.id;
-    if ( Math.floor((new Date() - updatedAverageWait)/60000) > 5 ) {
+    if ( Math.floor((new Date() - updatedAverageWait)/60000) > interval ) {
         updatedAverageWait = new Date();
         if (numberOfCallsForAvg > 0){
             tempAverageWait = tempAverageWait/numberOfCallsForAvg;
@@ -107,7 +107,7 @@ ioClient.on("endCallReport", (msg) => {
 });
 var totalKey = "totalWaiting";
 ioClient.on(totalKey, (msg) => {
-    if ( Math.floor((new Date() - updatedTotalWaitingCalls)/60000) >= 5 ) {
+    if ( Math.floor((new Date() - updatedTotalWaitingCalls)/60000) >= interval ) {
         updatedTotalWaitingCalls =  new Date();
         redisClient.set("totalWaitingAgg-" + totalWaitingCallsCounter, parseInt(msg), function (err, reply) {
             redisClient.expireat(totalKey, parseInt(todayEnd / 1000));
