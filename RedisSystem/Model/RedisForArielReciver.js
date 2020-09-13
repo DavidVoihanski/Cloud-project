@@ -59,6 +59,7 @@ async function sendDashboardData(){
 
 async function getAverageWaitForAggregation(){
     let keys = await redisClient.keysAsync('waitTimeForAggregation-*');
+    keys.sort();
     let averageWaitTimeList = [];
     for(var i=0;i< keys.length;i++){
         let response = await redisClient.getAsync(keys[i]);
@@ -69,6 +70,7 @@ async function getAverageWaitForAggregation(){
 
 async function getTotalWaitingForAggregation(){
     let keys = await redisClient.keysAsync('totalWaitingAgg-*');
+    keys.sort();
     let totalWaitingList = [];
     for(var i=0;i< keys.length;i++){
         let response = await redisClient.getAsync(keys[i]);
@@ -79,6 +81,7 @@ async function getTotalWaitingForAggregation(){
 
 async function getTimeForAggregation(){
     let keys = await redisClient.keysAsync('timeAgg-*');
+    keys.sort();
     let timeList = [];
     for(var i=0;i< keys.length;i++){
         let response = await redisClient.getAsync(keys[i]);
