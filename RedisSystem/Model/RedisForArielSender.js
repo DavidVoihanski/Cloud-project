@@ -53,15 +53,17 @@ ioClient.on("endCallReport", (msg) => {
         if (numberOfCallsForAvg > 0){
             tempAverageWait = tempAverageWait/numberOfCallsForAvg;
         }
-        redisClient.set("waitTimeForAggregation-" + averageWaitTimeCounter, callDetailsJson.totalTime, function (err, reply) {
-            redisClient.expireat(key, parseInt((+new Date) / 1000) + 600);
+		var waitTimeAggKey = "waitTimeForAggregation-" + averageWaitTimeCounter;
+        redisClient.set(waitTimeAggKey, callDetailsJson.totalTime, function (err, reply) {
+            redisClient.expireat(waitTimeAggKey, parseInt((+new Date) / 1000) + 600);
         });
         var hoursForTimeAgg = updatedAverageWait.getHours();
         var minutesForTimeAgg = updatedAverageWait.getMinutes();
         var moodInterval = minutesForTimeAgg%interval;
         var timeAggValue = hoursForTimeAgg + ":" + (minutesForTimeAgg-moodInterval);
-        redisClient.set("timeAgg-" + averageWaitTimeCounter, timeAggValue, function (err, reply) {
-            redisClient.expireat(key, parseInt((+new Date) / 1000) + 600);
+		var timeAggKey = "timeAgg-" + averageWaitTimeCounter;
+        redisClient.set(timeAggKey, timeAggValue, function (err, reply) {
+            redisClient.expireat(timeAggKey, parseInt((+new Date) / 1000) + 600);
         });
         averageWaitTimeCounter += 1;
         tempAverageWait = 0;
@@ -109,8 +111,9 @@ var totalKey = "totalWaiting";
 ioClient.on(totalKey, (msg) => {
     if ( Math.floor((new Date() - updatedTotalWaitingCalls)/60000) >= interval ) {
         updatedTotalWaitingCalls =  new Date();
-        redisClient.set("totalWaitingAgg-" + totalWaitingCallsCounter, parseInt(msg), function (err, reply) {
-            redisClient.expireat(totalKey, parseInt(todayEnd / 1000));
+		var totalWaitingAggKey = "totalWaitingAgg-" + totalWaitingCallsCounter;
+        redisClient.set(totalWaitingAggKey, parseInt(msg), function (err, reply) {
+            redisClient.expireat(totalWaitingAggKey, parseInt(todayEnd / 1000));
         });
         totalWaitingCallsCounter += 1;
     }
