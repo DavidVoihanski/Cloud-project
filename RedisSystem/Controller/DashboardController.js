@@ -169,7 +169,7 @@ function updateAggregationTable(totalWaitingTable, avgWaitTimeTable, timeTable){
         avgWaitTimeCell.innerHTML = avgWaitTimeTable[i]
     }
 }
-async function updateAggregationChart(msg){ // to replace labels with 5 minutes intervals time. 
+async function updateAggregationChart(msg){
     var totalWaitingChart = msg.totalWaitList;  
     var avgWaitTimeChart = msg.averageWaitList;
     var timeCart = msg.timeList;
