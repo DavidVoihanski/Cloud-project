@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 var server = require('http').createServer(app);
-const port = 3000
+const port = 3334
 
 const redisReceiver = require('./Model/RedisForArielReciver');
 const redisSender = require ('./Model/RedisForArielSender');

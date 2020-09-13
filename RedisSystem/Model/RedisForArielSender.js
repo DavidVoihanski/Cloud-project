@@ -18,7 +18,7 @@ var averageWaitTimeCounter = 0;
 var tempAverageWait = 0;
 var updatedAverageWait = new Date().setHours(0, 0, 0, 0);
 var numberOfCallsForAvg = 0;
-
+var interval = 5;
 
 redisClient.keys('lang-*', function (err, keys) {
     if (err) return console.log(err);
@@ -48,13 +48,19 @@ ioClient.on("endCallReport", (msg) => {
         redisClient.expireat(Callkey, parseInt(todayEnd / 1000));
     });
     var key = 'waitingTime-' + callDetailsJson.id;
-    
     if ( Math.floor((new Date() - updatedAverageWait)/60000) > 5 ) {
         updatedAverageWait = new Date();
         if (numberOfCallsForAvg > 0){
             tempAverageWait = tempAverageWait/numberOfCallsForAvg;
         }
         redisClient.set("waitTimeForAggregation-" + averageWaitTimeCounter, callDetailsJson.totalTime, function (err, reply) {
+            redisClient.expireat(key, parseInt((+new Date) / 1000) + 600);
+        });
+        var hoursForTimeAgg = updatedAverageWait.getHours();
+        var minutesForTimeAgg = updatedAverageWait.getMinutes();
+        var moodInterval = minutesForTimeAgg%interval;
+        var timeAggValue = hoursForTimeAgg + ":" + (minutesForTimeAgg-moodInterval);
+        redisClient.set("timeAgg-" + averageWaitTimeCounter, timeAggValue, function (err, reply) {
             redisClient.expireat(key, parseInt((+new Date) / 1000) + 600);
         });
         averageWaitTimeCounter += 1;

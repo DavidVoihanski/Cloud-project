@@ -3,7 +3,7 @@ var redis = require('redis');
 var redisClient = redis.createClient();
 io = require("socket.io-client");
 ioClient = io.connect("http://localhost:6062");
-var data = require('../../Model/data');
+var data = require('./data');
 
 ioClient.on("viewDash", (msg) => {
     sendDashboardData();
@@ -44,9 +44,11 @@ async function sendDashboardData(){
     };
     var totalWaitingListForAggregation = await getTotalWaitingForAggregation();
     var averageWaitTimeListForAggregation = await getAverageWaitForAggregation();
+    var timeListForAggregation = await getTimeForAggregation();
     var dataForAggregationTabe = {
         totalWaitList: totalWaitingListForAggregation,
-        averageWaitList: averageWaitTimeListForAggregation
+        averageWaitList: averageWaitTimeListForAggregation,
+        timeList: timeListForAggregation
     }
     ioClient.emit("totalWaitingCallsForAggregation", dataForAggregationTabe);
     ioClient.emit("topicLang",callTopicAndLanguageChartData);
@@ -73,6 +75,16 @@ async function getTotalWaitingForAggregation(){
         totalWaitingList.push(response);
     }
     return totalWaitingList;
+}
+
+async function getTimeForAggregation(){
+    let keys = await redisClient.keysAsync('timeAgg-*');
+    let timeList = [];
+    for(var i=0;i< keys.length;i++){
+        let response = await redisClient.getAsync(keys[i]);
+        timeList.push(response);
+    }
+    return timeList;
 }
 
 async function getTotalWaitingCalls(){

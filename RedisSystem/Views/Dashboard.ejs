@@ -21,11 +21,22 @@
                     <canvas id="SnapShotChartAvg" width= "500px" height="400"></canvas>
                   </div>
             </div>
+            <div class="row" style="padding-top: 30px;">
+                <div class="col-6 chart">
+                  <p style="text-align: center; font: bold;">Number of waiting calls at 5 minutes intervals</p>
+                    <canvas id="WaitingCallsAggregetionChartCanvas" width= "500px" height="220"></canvas>
+                </div>
+                <div class="col-6 chart">
+                  <p style="text-align: center; font: bold;">Waiting times at 5 minutes intervals</p>
+                  <canvas id="WaitingTimeAggregetionChartCanvas" width= "500px" height="220"></canvas>
+              </div>
+            </div>
             <div class="row" style="padding-top: 50px; padding-bottom: 20px;">
                 <link rel="stylesheet" href="./Dashboard.css">
                 <table class="table table-bordered table-dark border" id="SnapShotTable">
                     <thead class="AggregetionTableHead">
                       <tr>
+                        <th scope="col" style="width: 500px;">Time</th>
                         <th scope="col" style="width: 475px;">Number of waiting calls</th>
                         <th scope="col" style="width: 500px;">Waiting times</th>
                       </tr>
@@ -35,6 +46,7 @@
                     </tbody>
                   </table>
             </div>
+
             <div>
                 <table id="cityTopicsTable" class="table table-bordered table-dark border">
                     <tr>
