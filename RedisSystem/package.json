@@ -1,0 +1,21 @@
+{
+  "name": "redissystem",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon run app"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^3.2.0",
+    "bluebird": "^3.7.2",
+    "ejs": "^3.1.5",
+    "node-rdkafka": "^2.9.1",
+    "nodemon": "^2.0.4",
+    "redis": "^3.0.2",
+    "socket.io": "^2.3.0",
+    "socket.io-client": "^2.3.0"
+  }
+}
