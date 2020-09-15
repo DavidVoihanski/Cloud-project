@@ -1,7 +1,3 @@
-// הפעילו את 
-// redis
-// מתמונת דוקר הנמצאית כאן
-// https://hub.docker.com/_/redis
 var bluebird = require('bluebird')
 var redis = require('redis');
 bluebird.promisifyAll(redis.RedisClient.prototype);
@@ -18,28 +14,8 @@ var averageWaitTimeCounter = 0;
 var tempAverageWait = 0;
 var updatedAverageWait = new Date().setHours(0, 0, 0, 0);
 var numberOfCallsForAvg = 0;
+var interval = 5;
 
-
-redisClient.keys('lang-*', function (err, keys) {
-    if (err) return console.log(err);
-    async.map(keys, function (key, cb) {
-        redisClient.get(key, function (error, value) {
-            redisClient.ttl(key, function (er, ttl) {
-                if (error | er) return cb(error);
-                var job = {};
-                job['key'] = key;
-                job['val'] = value;
-                job['ttl'] = ttl;
-                cb(null, job);
-            });
-        });
-    },
-        function (error, results) {
-            if (error) return console.log(error);
-            console.log(results);
-        }
-    )
-});
 ioClient.on("endCallReport", (msg) => {
     callDetailsJson = JSON.parse(msg)
     console.log("end call report in redis: ", msg);
@@ -48,14 +24,22 @@ ioClient.on("endCallReport", (msg) => {
         redisClient.expireat(Callkey, parseInt(todayEnd / 1000));
     });
     var key = 'waitingTime-' + callDetailsJson.id;
-    
-    if ( Math.floor((new Date() - updatedAverageWait)/60000) > 5 ) {
+    if ( Math.floor((new Date() - updatedAverageWait)/60000) > interval ) {
         updatedAverageWait = new Date();
         if (numberOfCallsForAvg > 0){
             tempAverageWait = tempAverageWait/numberOfCallsForAvg;
         }
-        redisClient.set("waitTimeForAggregation-" + averageWaitTimeCounter, callDetailsJson.totalTime, function (err, reply) {
-            redisClient.expireat(key, parseInt((+new Date) / 1000) + 600);
+		var waitTimeAggKey = "waitTimeForAggregation-" + averageWaitTimeCounter;
+        redisClient.set(waitTimeAggKey, callDetailsJson.totalTime, function (err, reply) {
+            redisClient.expireat(waitTimeAggKey, parseInt(todayEnd / 1000));
+        });
+        var hoursForTimeAgg = updatedAverageWait.getHours();
+        var minutesForTimeAgg = updatedAverageWait.getMinutes();
+        var moodInterval = minutesForTimeAgg%interval;
+        var timeAggValue = hoursForTimeAgg + ":" + (minutesForTimeAgg-moodInterval);
+		var timeAggKey = "timeAgg-" + averageWaitTimeCounter;
+        redisClient.set(timeAggKey, timeAggValue, function (err, reply) {
+            redisClient.expireat(timeAggKey, parseInt(todayEnd / 1000));
         });
         averageWaitTimeCounter += 1;
         tempAverageWait = 0;
@@ -101,10 +85,11 @@ ioClient.on("endCallReport", (msg) => {
 });
 var totalKey = "totalWaiting";
 ioClient.on(totalKey, (msg) => {
-    if ( Math.floor((new Date() - updatedTotalWaitingCalls)/60000) >= 5 ) {
+    if ( Math.floor((new Date() - updatedTotalWaitingCalls)/60000) >= interval ) {
         updatedTotalWaitingCalls =  new Date();
-        redisClient.set("totalWaitingAgg-" + totalWaitingCallsCounter, parseInt(msg), function (err, reply) {
-            redisClient.expireat(totalKey, parseInt(todayEnd / 1000));
+		var totalWaitingAggKey = "totalWaitingAgg-" + totalWaitingCallsCounter;
+        redisClient.set(totalWaitingAggKey, parseInt(msg), function (err, reply) {
+            redisClient.expireat(totalWaitingAggKey, parseInt(todayEnd / 1000));
         });
         totalWaitingCallsCounter += 1;
     }

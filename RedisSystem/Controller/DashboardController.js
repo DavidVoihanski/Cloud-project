@@ -151,20 +151,52 @@ async function initSocket() {
     socket.on("avgWaitTime", (msg) => { updateAvg(msg);});
     socket.on("topicLang", (msg) => { updateLanguageAndCallTopic(msg)});
     socket.on('cityTopic', (msg) => { updateCityAndCallTopic(msg)});
-    socket.on("totalWaitingCallsForAggregation", (msg) => {updateAggregationTable(msg.totalWaitList, msg.averageWaitList);});
+    socket.on("totalWaitingCallsForAggregation", (msg) => {updateAggregationTable(msg.totalWaitList, msg.averageWaitList, msg.timeList);
+                                                    updateAggregationChart(msg)});
     socket.emit('viewDash',0); 
 }
 
-function updateAggregationTable(totalWaitingTable, avgWaitTimeTable){
+function updateAggregationTable(totalWaitingTable, avgWaitTimeTable, timeTable){
     let len = totalWaitingTable.length;
     var table = document.getElementById('SnapShotTable');
     for (var i = 0; i < len; i++){
         var tr = table.insertRow();
-        var c = tr.insertCell(0); 
-        c.innerHTML = totalWaitingTable[i];
-        var cC = tr.insertCell(1); 
-        cC.innerHTML = avgWaitTimeTable[i]
+        var timeCell = tr.insertCell(0); 
+        timeCell.innerHTML = timeTable[i];
+        var totalWaitingCell = tr.insertCell(1); 
+        totalWaitingCell.innerHTML = totalWaitingTable[i];
+        var avgWaitTimeCell = tr.insertCell(2); 
+        avgWaitTimeCell.innerHTML = avgWaitTimeTable[i]
     }
+}
+async function updateAggregationChart(msg){
+    var totalWaitingChart = msg.totalWaitList;  
+    var avgWaitTimeChart = msg.averageWaitList;
+    var timeCart = msg.timeList;
+    let WaitingCallsAggregetionChartCanvas =document.getElementById("WaitingCallsAggregetionChartCanvas").getContext('2d');
+    var WaitingCallsAggregetionChart = new Chart(WaitingCallsAggregetionChartCanvas, {
+    type: 'bar',
+    data: {
+        labels: timeCart,
+        datasets: [{
+            label: 'waiting calls',
+            data: totalWaitingChart,
+            backgroundColor: colors
+        }]
+    }
+});
+    let WaitingTimeAggregetionChartCanvas = document.getElementById("WaitingTimeAggregetionChartCanvas").getContext('2d');
+    var WaitingTimeAggregetionChart = new Chart(WaitingTimeAggregetionChartCanvas, {
+    type: 'bar',
+    data: {
+        labels: timeCart,
+        datasets: [{
+            label: 'waiting times',
+            data: avgWaitTimeChart,
+            backgroundColor: colors.reverse()
+        }]
+    }
+    });
 }
 
 function updateCityAndCallTopic(msg){
