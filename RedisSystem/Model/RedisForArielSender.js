@@ -1,7 +1,3 @@
-// הפעילו את 
-// redis
-// מתמונת דוקר הנמצאית כאן
-// https://hub.docker.com/_/redis
 var bluebird = require('bluebird')
 var redis = require('redis');
 bluebird.promisifyAll(redis.RedisClient.prototype);
@@ -20,26 +16,6 @@ var updatedAverageWait = new Date().setHours(0, 0, 0, 0);
 var numberOfCallsForAvg = 0;
 var interval = 5;
 
-redisClient.keys('lang-*', function (err, keys) {
-    if (err) return console.log(err);
-    async.map(keys, function (key, cb) {
-        redisClient.get(key, function (error, value) {
-            redisClient.ttl(key, function (er, ttl) {
-                if (error | er) return cb(error);
-                var job = {};
-                job['key'] = key;
-                job['val'] = value;
-                job['ttl'] = ttl;
-                cb(null, job);
-            });
-        });
-    },
-        function (error, results) {
-            if (error) return console.log(error);
-            console.log(results);
-        }
-    )
-});
 ioClient.on("endCallReport", (msg) => {
     callDetailsJson = JSON.parse(msg)
     console.log("end call report in redis: ", msg);
@@ -55,7 +31,7 @@ ioClient.on("endCallReport", (msg) => {
         }
 		var waitTimeAggKey = "waitTimeForAggregation-" + averageWaitTimeCounter;
         redisClient.set(waitTimeAggKey, callDetailsJson.totalTime, function (err, reply) {
-            redisClient.expireat(waitTimeAggKey, parseInt((+new Date) / 1000) + 600);
+            redisClient.expireat(waitTimeAggKey, parseInt(todayEnd / 1000));
         });
         var hoursForTimeAgg = updatedAverageWait.getHours();
         var minutesForTimeAgg = updatedAverageWait.getMinutes();
@@ -63,7 +39,7 @@ ioClient.on("endCallReport", (msg) => {
         var timeAggValue = hoursForTimeAgg + ":" + (minutesForTimeAgg-moodInterval);
 		var timeAggKey = "timeAgg-" + averageWaitTimeCounter;
         redisClient.set(timeAggKey, timeAggValue, function (err, reply) {
-            redisClient.expireat(timeAggKey, parseInt((+new Date) / 1000) + 600);
+            redisClient.expireat(timeAggKey, parseInt(todayEnd / 1000));
         });
         averageWaitTimeCounter += 1;
         tempAverageWait = 0;
