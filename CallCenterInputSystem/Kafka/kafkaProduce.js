@@ -4,19 +4,15 @@ const uuid = require("uuid");
 const Kafka = require("node-rdkafka");
 
 const kafkaConf = {
-  "group.id": "cloudkarafka-example",
-  "metadata.broker.list": "rocket-01.srvs.cloudkafka.com:9094,rocket-02.srvs.cloudkafka.com:9094,rocket-03.srvs.cloudkafka.com:9094".split(","),
-  "socket.keepalive.enable": true,
-  "security.protocol": "SASL_SSL",
-  "sasl.mechanisms": "SCRAM-SHA-256",
-  "sasl.username": "oerf9u12",
-  "sasl.password": "4dtKihVz3nU7Erjofw9kS3ZjPj0X9_L7",
-  "debug": "generic,broker,security"
+  'metadata.broker.list': 'kafka-797775b-bargenish-dc7f.aivencloud.com:28211',
+    'security.protocol': 'ssl',
+    'ssl.key.location': '../KafkaConf/service.key',
+    'ssl.certificate.location': '../KafkaConf/service.cert',
+    'ssl.ca.location': '../KafkaConf/ca.pem',
+    'dr_cb': true
 };
 
-const prefix = "oerf9u12-";
 const producer = new Kafka.Producer(kafkaConf);
-
 const genMessage = m => new Buffer.alloc(m.length,m);
 
 producer.on("ready", function(arg) {
@@ -27,7 +23,6 @@ producer.connect();
 module.exports.publish= function(msg, topic)
 {   
   m=JSON.stringify(msg);
-  topic_ = prefix + topic;
-  producer.produce(topic_, -1, genMessage(m), uuid.v4());
+  producer.produce(topic, -1, genMessage(m), uuid.v4());
   //producer.disconnect();
 }

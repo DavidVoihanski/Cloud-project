@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 io = require("socket.io-client");
 client = io.connect("http://localhost:6666");
 
-const URL = "mongodb+srv://bar:genish13@mongodb.ictvj.mongodb.net/MongoDB?retryWrites=true&w=majority"
+const URL = "mongodb+srv://usermame:password@mongodb.ictvj.mongodb.net/MongoDB?retryWrites=true&w=majority"
 const connectDB = async () => {
     await mongoose.connect(URL, {useUnifiedTopology: true, useNewUrlParser: true})
     console.log("connected to mongo...!")
